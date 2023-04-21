@@ -23,7 +23,7 @@ app.post('/api/stock/:productId/movement', async (req, res) => {
     // Ajouter la quantité fournie à la quantité en stock
     products[productId].quantity += stockMovement.quantity;
     console.log('produit ajouté')
-    res.status(204).send();
+    res.status(204).send('produit ajouté');
   } else {
     try {
       // Vérifier auprès du catalogue si le produit existe

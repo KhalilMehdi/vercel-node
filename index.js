@@ -5,8 +5,8 @@ app.use(express.json());
 
 const products = {}; // stock de produits
 
-
 // ID de test : 6442597dfd03626d794bd54a
+
 app.post('/api/stock/:productId/movement', async (req, res) => {
   const productId = req.params.productId;
   const stockMovement = req.body;

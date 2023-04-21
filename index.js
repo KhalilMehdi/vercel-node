@@ -34,7 +34,7 @@ app.post('/api/stock/:productId/movement', (req, res) => {
 });
 
 function getProductFromCatalogue(productId) {
-  const url = `http://microservices.tp.rjqu8633.odns.fr/products/${productId}`;
+  const url = `http://microservices.tp.rjqu8633.odns.fr/api/products/${productId}`;
   return axios.get(url)
     .then(response => {
       if (response.status === 200) {

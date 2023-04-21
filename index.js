@@ -17,22 +17,39 @@ app.get("/api/ping", (req, res) => {
 
 
 
-app.post('/api/stock/:productId', async (req, res) => {
+app.post('/api/stock/:productId/:action', async (req, res) => {
   const productId = req.params.productId;
   const stockMovement = req.body;
+  const action = req.params.action;
 
   // Vérifier si le produit existe déjà dans le stock
   if (products[productId]) {
-    // Vérifier si la quantité demandée est disponible
-    if (products[productId].quantity >= stockMovement.quantity) {
-      // Réserver la quantité demandée
-      products[productId].reserved += stockMovement.quantity;
-      products[productId].quantity -= stockMovement.quantity;
-      console.log('produit réservé');
-      res.status(204).send('produit réservé');
+    if (action === 'add') {
+      // Vérifier si la quantité demandée est disponible
+      if (products[productId].quantity >= stockMovement.quantity) {
+        // Réserver la quantité demandée
+        products[productId].reserved += stockMovement.quantity;
+        products[productId].quantity -= stockMovement.quantity;
+        console.log('produit réservé');
+        res.status(204).send('produit réservé');
+      } else {
+        // Retourner une erreur si la quantité demandée est supérieure à la quantité disponible
+        res.status(400).send('Quantité demandée supérieure à la quantité disponible');
+      }
+    } else if (action === 'remove') {
+      // Vérifier si la quantité réservée est suffisante
+      if (products[productId].reserved >= stockMovement.quantity) {
+        // Décrémenter la quantité réservée
+        products[productId].reserved -= stockMovement.quantity;
+        console.log('produit retiré du stock');
+        res.status(204).send('produit retiré du stock');
+      } else {
+        // Retourner une erreur si la quantité réservée est insuffisante
+        res.status(400).send('Quantité réservée insuffisante');
+      }
     } else {
-      // Retourner une erreur si la quantité demandée est supérieure à la quantité disponible
-      res.status(400).send('Quantité demandée supérieure à la quantité disponible');
+      // Retourner une erreur si l'action est inconnue
+      res.status(400).send('Action inconnue');
     }
   } else {
     try {

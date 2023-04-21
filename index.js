@@ -15,30 +15,40 @@ app.get("/api/ping", (req, res) => {
 
 // ID de test : 6442597dfd03626d794bd54a
 
+
+
 app.post('/api/stock/:productId', async (req, res) => {
   const productId = req.params.productId;
   const stockMovement = req.body;
 
   // Vérifier si le produit existe déjà dans le stock
   if (products[productId]) {
-    // Ajouter la quantité fournie à la quantité en stock
-    products[productId].quantity += stockMovement.quantity;
-    console.log('produit ajouté')
-    res.status(204).send('produit ajouté');
+    // Vérifier si la quantité demandée est disponible
+    if (products[productId].quantity >= stockMovement.quantity) {
+      // Réserver la quantité demandée
+      products[productId].reserved += stockMovement.quantity;
+      products[productId].quantity -= stockMovement.quantity;
+      console.log('produit réservé');
+      res.status(204).send('produit réservé');
+    } else {
+      // Retourner une erreur si la quantité demandée est supérieure à la quantité disponible
+      res.status(400).send('Quantité demandée supérieure à la quantité disponible');
+    }
   } else {
     try {
       // Vérifier auprès du catalogue si le produit existe
       const productDto = await getProductFromCatalogue(productId);
 
       if (productDto) {
-        // Si le produit existe, l'ajouter au stock avec la quantité fournie
+        // Si le produit existe, l'ajouter au stock avec la quantité fournie et la quantité réservée à zéro
         products[productId] = {
           name: productDto.name,
           description: productDto.description,
-          quantity: stockMovement.quantity
+          quantity: stockMovement.quantity,
+          reserved: 0
         };
-        console.log('produit existe')
-        res.status(204).send('produit existe');
+        console.log('produit ajouté');
+        res.status(204).send('produit ajouté');
       } else {
         // Si le produit n'existe pas, refuser l'intégration au stock
         res.status(404).send('Produit inconnu'); 
@@ -49,7 +59,6 @@ app.post('/api/stock/:productId', async (req, res) => {
     }
   }
 });
-
 
 app.get('/api/stock', async (req, res) => {
   const stockProducts = [];
@@ -70,6 +79,10 @@ app.get('/api/stock', async (req, res) => {
 
   res.status(200).json(stockProducts);
 });
+
+
+
+
 
 
 async function getProductFromCatalogue(productId) {

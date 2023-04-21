@@ -20,6 +20,8 @@ app.post('/api/stock/:productId/movement', async (req, res) => {
     const response = await fetch(`https://microservice-stock.vercel.app/api/products/${productId}`);
     const product = await response.json();
 
+    console.log(product)
+
     // Si le produit existe, ajouter la quantité fournie au stock
     // Si le produit n'existe pas, renvoyer une erreur
     if (product) {

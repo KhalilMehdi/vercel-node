@@ -56,20 +56,26 @@ app.post('/api/stock/:productId', async (req, res) => {
 //   const availableProducts = Object.values(products).filter(product => product.quantity > 0);
 //   res.status(200).json(availableProducts);
 // });
-app.get('/api/stock', (req, res) => {
+app.get('/api/stock', async (req, res) => {
   const stockProducts = [];
 
   for (const productId in products) {
     if (products[productId].quantity > 0) {
-      stockProducts.push({
-        productId: productId,
-        quantity: products[productId].quantity
-      });
+      const productDto = await getProductFromCatalogue(productId);
+      if (productDto) {
+        stockProducts.push({ 
+          productId: productId,
+          name: productDto.name,
+          description: productDto.description,
+          quantity: products[productId].quantity
+        });
+      } 
     }
   }
 
   res.status(200).json(stockProducts);
 });
+
 
 // app.get('/api/stock', (req, res) => {
 //   const url = `http://microservices.tp.rjqu8633.odns.fr/api/products`;

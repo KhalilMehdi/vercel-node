@@ -41,7 +41,7 @@ app.post('/api/stock/:productId', async (req, res) => {
         res.status(204).send('produit existe');
       } else {
         // Si le produit n'existe pas, refuser l'intégration au stock
-        res.status(404).send('Produit inconnu');
+        res.status(404).send('Produit inconnu'); 
       }
     } catch (error) {
       console.error(error);
@@ -49,6 +49,45 @@ app.post('/api/stock/:productId', async (req, res) => {
     }
   }
 });
+
+
+// app.get('/api/stock', (req, res) => {
+
+//   const availableProducts = Object.values(products).filter(product => product.quantity > 0);
+//   res.status(200).json(availableProducts);
+// });
+app.get('/api/stock', (req, res) => {
+  const stockProducts = [];
+
+  for (const productId in products) {
+    if (products[productId].quantity > 0) {
+      stockProducts.push({
+        productId: productId,
+        quantity: products[productId].quantity
+      });
+    }
+  }
+
+  res.status(200).json(stockProducts);
+});
+
+// app.get('/api/stock', (req, res) => {
+//   const url = `http://microservices.tp.rjqu8633.odns.fr/api/products`;
+//   try {
+//     const response = axios.get(url);
+//     if (response.status === 200) {
+//       return response.data; // Retourne le ProductDto si le produit existe
+//     } else {
+//       return null; // Retourne null si le produit n'existe pas
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     return null; // Retourne null en cas d'erreur de l'appel à l'API
+//   }
+// });
+
+
+
 
 async function getProductFromCatalogue(productId) {
   const url = `http://microservices.tp.rjqu8633.odns.fr/api/products/${productId}`;

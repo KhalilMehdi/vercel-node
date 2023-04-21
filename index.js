@@ -16,8 +16,10 @@ app.post('/stock/:productId/movement', async (req, res) => {
 
   // Vérifier que le produit existe dans le catalogue
   try {
-    const response = await fetch("https://microservice-stock.vercel.app/api/products/${productId}");
+    const response = await fetch(`http://microservices.tp.rjqu8633.odns.fr/api/products/${productId}`);
     const product = await response.json();
+
+    console.log(product)
 
     // Si le produit existe, ajouter la quantité fournie au stock
     // Si le produit n'existe pas, renvoyer une erreur
@@ -30,6 +32,15 @@ app.post('/stock/:productId/movement', async (req, res) => {
   } catch (error) {
     res.status(500).send('Erreur lors de la vérification du produit');
   }
+
+  // TODO : Ajouter un événement de stock
+  const stockMovement: StockMovementDto = {
+    productId,
+    quantity,
+    type: StockMovementType.IN,
+    status,
+  };
+
 });
 
 // Initialize server

@@ -1,22 +1,20 @@
+// Importer les dépendances
 const express = require('express');
 const axios = require('axios');
+
+// Créer une application Express et activer l'analyse JSON pour les requêtes entrantes
 const app = express();
 app.use(express.json());
 
-const products = {}; // stock de produits
+// Initialiser le stock de produits
+const products = {};
 
-
-// Create GET request
+// Créer une requête GET pour vérifier si le serveur fonctionne
 app.get("/api/ping", (req, res) => {
   res.send("PONNG");
 });
 
-
-
-// ID de test : 6442597dfd03626d794bd54a
-
-
-
+// Définir la route POST pour ajouter ou supprimer un produit du stock
 app.post('/api/stock/:productId/:action', async (req, res) => {
   const productId = req.params.productId;
   const stockMovement = req.body;
@@ -32,11 +30,16 @@ app.post('/api/stock/:productId/:action', async (req, res) => {
         products[productId].quantity -= stockMovement.quantity;
         console.log('produit réservé');
         res.status(204).send('produit réservé');
-      } else {
+      }       
+      else {
+
         // Retourner une erreur si la quantité demandée est supérieure à la quantité disponible
         res.status(400).send('Quantité demandée supérieure à la quantité disponible');
-      }
+      } 
     } else if (action === 'remove') {
+      if (products[productId].quantity === 0) {
+        requestSupply(productId);
+      }
       // Vérifier si la quantité réservée est suffisante
       if (products[productId].reserved >= stockMovement.quantity) {
         // Décrémenter la quantité réservée
@@ -68,7 +71,7 @@ app.post('/api/stock/:productId/:action', async (req, res) => {
         res.status(204).send('produit ajouté');
       } else {
         // Si le produit n'existe pas, refuser l'intégration au stock
-        res.status(404).send('Produit inconnu'); 
+        res.status(404).send('Produit inconnu');
       }
     } catch (error) {
       console.error(error);
@@ -76,7 +79,20 @@ app.post('/api/stock/:productId/:action', async (req, res) => {
     }
   }
 });
+// Fonction pour envoyer une demande d'approvisionnement
+async function requestSupply(productId) {
+  const url = 'https://api-approvisionnement.vercel.app/api/supply-needed'; 
+  const requiredSupplyDto = { productId };
 
+  try {
+    await axios.post(url, requiredSupplyDto);
+    console.log(`Demande d'approvisionnement envoyée pour le produit ${productId}`);
+  } catch (error) {
+    console.error(`Erreur lors de l'envoi de la demande d'approvisionnement pour le produit ${productId}:`, error);
+  }
+}
+
+// Route GET pour récupérer la liste des produits en stock
 app.get('/api/stock', async (req, res) => {
   const stockProducts = [];
 
@@ -97,11 +113,7 @@ app.get('/api/stock', async (req, res) => {
   res.status(200).json(stockProducts);
 });
 
-
-
-
-
-
+// Fonction pour récupérer les informations d'un produit à partir du catalogue
 async function getProductFromCatalogue(productId) {
   const url = `http://microservices.tp.rjqu8633.odns.fr/api/products/${productId}`;
   try {
@@ -117,6 +129,7 @@ async function getProductFromCatalogue(productId) {
   }
 }
 
+// Lancer le serveur sur le port 3000
 app.listen(3000, () => {
   console.log('Serveur démarré sur le port 3000');
 });

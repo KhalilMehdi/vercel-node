@@ -12,9 +12,10 @@ app.get("/api/ping", (req, res) => {
 });
 
 
+
 // ID de test : 6442597dfd03626d794bd54a
 
-app.post('/api/stock/:productId/movement', async (req, res) => {
+app.post('/api/stock/:productId', async (req, res) => {
   const productId = req.params.productId;
   const stockMovement = req.body;
 

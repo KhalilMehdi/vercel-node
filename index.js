@@ -1,58 +1,54 @@
-import { StockMovementDto } from './types';
-// Add Express
-const express = require("express");
-
-
-// Initialize Express
+const express = require('express');
+const axios = require('axios');
 const app = express();
+app.use(express.json());
 
-// Create GET request
-app.get("/api/ping", (req, res) => {
-  res.send("PONNG");
-});
+const products = {}; // stock de produits
 
-//GET products
-// app.get(`/api/products`, (req, res) => {
-//   fetch(`https://microservice-stock.vercel.app/api/products`)
-//     .then((response) => response.json())
-//     .then((data) => {
-//       console.log(data);
-//       res.status(200).send(data);
-//     })
-// }); 
+app.post('/api/stock/:productId/movement', (req, res) => {
+  const productId = req.params.productId;
+  const stockMovement = req.body;
 
-// // Endpoint pour accepter des marchandises dans le stock
-app.post('/api/stock/:productId/movement', async (req, res) => {
-  const { productId } = req.params;
-  const { quantity, status } = req.body;
+  // Vérifier si le produit existe déjà dans le stock
+  if (products[productId]) {
+    // Ajouter la quantité fournie à la quantité en stock
+    products[productId].quantity += stockMovement.quantity;
+  } else {
+    // Vérifier auprès du catalogue si le produit existe
+    const productDto = getProductFromCatalogue(productId);
 
-  // Vérifier que le produit existe dans le catalogue
-  try {
-    const response = await fetch(`https://microservice-stock.vercel.app/api/products/${productId}`);
-    const product = await response.json();
-
-    console.log(product)
-
-    // Si le produit existe, ajouter la quantité fournie au stock
-    // Si le produit n'existe pas, renvoyer une erreur
-    if (product) {
-      // TODO : Ajouter la quantité fournie au stock
-      res.status(204).send();
+    if (productDto) {
+      // Si le produit existe, l'ajouter au stock avec la quantité fournie
+      products[productId] = {
+        name: productDto.name,
+        description: productDto.description,
+        quantity: stockMovement.quantity
+      };
     } else {
-      res.status(400).send('Le produit n\'existe pas dans le catalogue');
+      // Si le produit n'existe pas, refuser l'intégration au stock
+      return res.status(404).send('Produit inconnu');
     }
-
-
-
-  } catch (error) {
-    res.status(500).send('Erreur lors de la vérification du produit');
   }
+
+  res.status(204).send();
 });
 
-// Initialize server
-app.listen(5000, () => {
-  console.log("Running on port 5000.");
+function getProductFromCatalogue(productId) {
+  const url = `http://microservices.tp.rjqu8633.odns.fr/products/${productId}`;
+  return axios.get(url)
+    .then(response => {
+      if (response.status === 200) {
+        return response.data; // Retourne le ProductDto si le produit existe
+      } else {
+        return null; // Retourne null si le produit n'existe pas
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      return null; // Retourne null en cas d'erreur de l'appel à l'API
+    });
+}
+
+app.listen(3000, () => {
+  console.log('Serveur démarré sur le port 3000');
 });
-
-module.exports = app;
-

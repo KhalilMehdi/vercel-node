@@ -20,7 +20,7 @@ app.get(`/api/products`, (req, res) => {
       res.status(200).send(data);
     })
 
-});
+}); 
 
 // // Endpoint pour accepter des marchandises dans le stock
 app.post('/api/stock/:productId/movement', async (req, res) => {

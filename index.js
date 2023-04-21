@@ -13,7 +13,7 @@ app.get("/api/ping", (req, res) => {
 // // Endpoint pour accepter des marchandises dans le stock
 app.post('/api/stock/:productId/movement', async (req, res) => {
   const { productId } = req.params;
-  const { quantity, status } = req.body as StockMovementDto;
+  const { quantity, status } = req.body;
 
   // Vérifier que le produit existe dans le catalogue
   try {

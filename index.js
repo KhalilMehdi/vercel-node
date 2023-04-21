@@ -5,6 +5,13 @@ app.use(express.json());
 
 const products = {}; // stock de produits
 
+
+// Create GET request
+app.get("/api/ping", (req, res) => {
+  res.send("PONNG");
+});
+
+
 // ID de test : 6442597dfd03626d794bd54a
 
 app.post('/api/stock/:productId/movement', async (req, res) => {

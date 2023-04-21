@@ -1,7 +1,7 @@
 import { StockMovementDto } from './types';
 // Add Express
 const express = require("express");
-// const fetch = require('node-fetch');
+const fetch = require('node-fetch');
 
 
 // Initialize Express
@@ -14,7 +14,6 @@ app.get("/api/ping", (req, res) => {
 
 //GET products
 // app.get(`/api/products`, (req, res) => {
-
 //   fetch(`https://microservice-stock.vercel.app/api/products`)
 //     .then((response) => response.json())
 //     .then((data) => {

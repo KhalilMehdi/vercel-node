@@ -11,6 +11,6 @@ export interface StockMovementDto {
   }
   
   export interface StockProductDto {
-    productId: string;
-    quantity: number;
+    productId: "string";
+    quantity: 1;
   }

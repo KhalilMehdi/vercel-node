@@ -1,6 +1,8 @@
 import { StockMovementDto } from './types';
 // Add Express
 const express = require("express");
+const fetch = require('node-fetch');
+
 
 // Initialize Express
 const app = express();

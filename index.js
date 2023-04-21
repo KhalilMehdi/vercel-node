@@ -22,6 +22,7 @@ app.post('/api/stock/:productId/movement', async (req, res) => {
   if (products[productId]) {
     // Ajouter la quantité fournie à la quantité en stock
     products[productId].quantity += stockMovement.quantity;
+    console.log('produit ajouté')
     res.status(204).send();
   } else {
     try {
@@ -35,7 +36,8 @@ app.post('/api/stock/:productId/movement', async (req, res) => {
           description: productDto.description,
           quantity: stockMovement.quantity
         };
-        res.status(204).send();
+        console.log('produit existe')
+        res.status(204).send('produit existe');
       } else {
         // Si le produit n'existe pas, refuser l'intégration au stock
         res.status(404).send('Produit inconnu');

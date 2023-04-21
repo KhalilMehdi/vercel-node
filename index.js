@@ -13,16 +13,15 @@ app.get("/api/ping", (req, res) => {
 });
 
 //GET products
-app.get(`/api/products`, (req, res) => {
+// app.get(`/api/products`, (req, res) => {
 
-  fetch(`https://microservice-stock.vercel.app/api/products`)
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      res.status(200).send(data);
-    })
-
-}); 
+//   fetch(`https://microservice-stock.vercel.app/api/products`)
+//     .then((response) => response.json())
+//     .then((data) => {
+//       console.log(data);
+//       res.status(200).send(data);
+//     })
+// }); 
 
 // // Endpoint pour accepter des marchandises dans le stock
 app.post('/api/stock/:productId/movement', async (req, res) => {
